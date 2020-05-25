@@ -8,6 +8,7 @@ pom.xml.asc
 /checkouts/
 .lein-deps-sum
 .lein-repl-history
+.rebel_readline_history
 .lein-plugins/
 .lein-failures
 .nrepl-port
