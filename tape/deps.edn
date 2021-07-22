@@ -1,7 +1,7 @@
 {
  :aliases {:dev {:extra-deps {cljdev/cljdev
-                               {:local/root "/home/nate/projects/cljdev"}
-                               #_{:git/url "https://github.com/justone/cljdev.git"
+                               #_{:local/root "/home/nate/projects/cljdev"}
+                               {:git/url "https://github.com/justone/cljdev.git"
                                               :sha "18a1fd036d0d68cfdef678df263c96567a6c5c83"}}
                   :main-opts  ["-m" "cljdev.repl"]
                   :exec-fn cljdev.repl/start
