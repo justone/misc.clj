@@ -1,0 +1,7 @@
+{:aliases {:repl {:extra-deps {cljdev/cljdev {:git/url "https://github.com/justone/cljdev.git"
+                                              :sha "dc9171f9f091e476a734714d128704876c7fa679"}}
+                  :main-opts  ["-m" "cljdev.repl"]
+                  :exec-fn cljdev.repl/start}}
+ :deps
+ {twttr/twttr {:mvn/version "3.2.3"}
+  }}

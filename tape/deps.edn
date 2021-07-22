@@ -1,0 +1,15 @@
+{
+ :aliases {:dev {:extra-deps {cljdev/cljdev
+                               {:local/root "/home/nate/projects/cljdev"}
+                               #_{:git/url "https://github.com/justone/cljdev.git"
+                                              :sha "18a1fd036d0d68cfdef678df263c96567a6c5c83"}}
+                  :main-opts  ["-m" "cljdev.repl"]
+                  :exec-fn cljdev.repl/start
+                  :ns-default cljdev.repl}
+           :test {:extra-paths ["test"]
+                  :extra-deps {lambdaisland/kaocha {:mvn/version "1.0.629"}}
+                  :main-opts  ["-m" "kaocha.runner"]}}
+ :deps
+ {cc.qbits/tape {:mvn/version "0.3.2"}
+  net.openhft/chronicle-queue {:mvn/version "5.20.42"}
+  }}
