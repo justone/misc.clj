@@ -1,6 +1,8 @@
 (ns scratch
   (:require [cheshire.core :as json]
+            [clojure.edn :as edn]
             [clojure.java.io :as io]
+            [clojure.pprint :refer [pprint]]
             [clojure.string :as str]
             [org.httpkit.client :as http]))
 
@@ -28,6 +30,8 @@
 
 ;; Caching
 
+(def cache-base "cache")
+
 (defn cache-key
   [req]
   (let [{:keys [url query-params]} req]
@@ -38,30 +42,45 @@
 #_(cache-key leagues-req)
 #_(cache-key (teams-req 253 2022))
 
+(defn- cache-file
+  [cache-key]
+  (io/file cache-base (format "%s.cache" cache-key)))
+
 (defn cache-lookup
-  [req]
-  (let [cache-key (cache-key req)]
-    (some-> (io/file cache-key))))
+  [cache-key]
+  (let [cache-file (cache-file cache-key)]
+    (when (.exists cache-file)
+      (-> cache-file
+          slurp
+          edn/read-string))))
 
 (defn cache-save
-  [resp req])
+  [resp cache-key]
+  (let [cache-file (cache-file cache-key)]
+    (.mkdirs (.getParentFile cache-file))
+    (->> (with-out-str (pprint resp))
+         (spit cache-file))))
+
+#_(cache-save {:body :thing} "foo")
+#_(cache-lookup "foo")
 
 
 ;; Request fulfilment
 
-(defn request
+(defn cached-request
   [req]
-  (-> (or (cache-lookup req)
-          (doto @(http/request req)
-            (cache-save req)))
-      :body
-      (json/parse-string true)))
+  (let [ckey (cache-key req)]
+    (-> (or (cache-lookup ckey)
+            (doto (-> @(http/request req)
+                      (update :body json/parse-string true))
+              (cache-save ckey)))
+        :body)))
 
 #_(-> leagues-req)
 
-#_(def leagues (request leagues-req))
+#_(def leagues (cached-request leagues-req))
 #_(first (:response leagues))
-#_(def mls-teams (request (teams-req 253 2022)))
+#_(def mls-teams (cached-request (teams-req 253 2022)))
 #_(first (:response mls-teams))
 
 ; (into [] (range 100))
