@@ -1,11 +1,11 @@
-{:aliases {:repl {:extra-deps {io.github.justone/cljdev {:sha "e3acb0fefcb3d97b70f4ef26c9064b18c73daa28"}}
+{:aliases {:repl {:extra-deps {io.github.justone/cljdev {:sha "71fcb369c173047ea04ec5815ac9c1dacb84ef02"}}
                   :main-opts  ["-m" "cljdev.repl"]
                   :exec-fn cljdev.repl/start}
            :test {:extra-paths ["test"]
-                  :extra-deps {lambdaisland/kaocha {:mvn/version "1.0.629"}}
+                  :extra-deps {lambdaisland/kaocha {:mvn/version "1.69.1069"}}
                   :main-opts  ["-m" "kaocha.runner"]}}
  :deps
  {org.clojure/clojure {:mvn/version "1.11.1"}
 
   cheshire/cheshire {:mvn/version "5.11.0"}
-  http-kit/http-kit {:mvn/version "2.6.0-RC1"}}}
+  http-kit/http-kit {:mvn/version "2.7.0-alpha1"}}}
