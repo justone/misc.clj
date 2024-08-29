@@ -130,8 +130,13 @@
 
   (def leagues (cached-request leagues-req))
   (first (:response leagues))
+  (filter (comp #(= % "Leagues Cup") :name :league) (:response leagues))
+  (filter #(string/includes? % "Cup") (map (comp :name :league) (:response leagues)))
   (def mls-teams (cached-request (teams-req 253 2024)))
   (def mls-standings (cached-request (standings-req 253 2024)))
+  (def mls-fixtures (cached-request (fixtures-req 253 2024)))
+  (def open-cup-fixtures (cached-request (fixtures-req 257 2024)))
+  (def leagues-cup-fixtures (cached-request (fixtures-req 772 2024)))
   (def mls-fixtures (cached-request (fixtures-req 253 2024)))
   (def mls-rounds (cached-request (rounds-req 253 2024)))
   (saveable? (cache-lookup "bad_req"))
@@ -158,10 +163,13 @@
 (defn fixture->opponent
   [fixture for-whom]
   (let [home-team (-> fixture :teams :home :name)
-        away-team (-> fixture :teams :away :name)]
+        home-goals (-> fixture :goals :home)
+        away-team (-> fixture :teams :away :name)
+        away-goals (-> fixture :goals :away)
+        ]
     (if (= home-team for-whom)
-      (str "vs " away-team)
-      (str "at " home-team))))
+      (str "vs " away-team " (" (or home-goals "x") "-" (or away-goals "x") ")")
+      (str "at " home-team " (" (or away-goals "x") "-" (or home-goals "x") ")"))))
 
 (defn team-schedules
   [rounds fixtures teams]
@@ -185,7 +193,7 @@
   (->> (for [team teams
              fixture (->> fixtures
                           (filter (fixture-played-by? #{team}))
-                          (filter (fixture-status? "NS")))
+                          #_(filter (fixture-status? "NS")))
              :let [dt-str (-> fixture :fixture :date)
                    dt (-> (ZonedDateTime/parse dt-str DateTimeFormatter/ISO_OFFSET_DATE_TIME)
                           (.withZoneSameInstant (ZoneId/systemDefault)))]]
@@ -210,8 +218,12 @@
                        (:response mls-fixtures)
                        ["Los Angeles Galaxy" "Los Angeles FC"])
        (print-table [:round :date "Los Angeles Galaxy" "Los Angeles FC"]))
-  (let [teams ["Los Angeles Galaxy" "Los Angeles FC" "Inter Miami" "FC Cincinnati"]]
-    (->> (team-schedules2 (:response mls-fixtures) teams)
+  (let [teams ["Los Angeles Galaxy" "Los Angeles FC" "Inter Miami" #_"FC Cincinnati"]]
+    (->> (team-schedules2 (:response leagues-cup-fixtures) teams)
+         (sort-by :date)
+         (print-table (cons :date teams))))
+  (let [teams ["Los Angeles FC" "Sporting Kansas City"]]
+    (->> (team-schedules2 (:response open-cup-fixtures) teams)
          (sort-by :date)
          (print-table (cons :date teams))))
   (-> (ZonedDateTime/parse "2024-09-01T02:30:00+00:00" DateTimeFormatter/ISO_OFFSET_DATE_TIME)
